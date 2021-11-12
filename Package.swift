@@ -20,9 +20,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "WXApi",
-            dependencies: []),
-        .testTarget(
-            name: "WXApiTests",
-            dependencies: ["WXApi"]),
+            dependencies: ["WXSDK"]),
+        .binaryTarget(
+            name: "WXSDK",
+            path: "Framework/WXSDK.xcframework")
     ]
 )
