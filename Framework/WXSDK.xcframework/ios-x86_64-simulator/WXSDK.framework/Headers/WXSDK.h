@@ -15,6 +15,6 @@ FOUNDATION_EXPORT const unsigned char WXSDKVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <WXSDK/PublicHeader.h>
 
-#import <WXSDK/WeChat.h>
-//#import <WXSDK/WXApiObject.h>
-//#import <WXSDK/WechatAuthSDK.h>
+#import <WXSDK/WXApi.h>
+#import <WXSDK/WXApiObject.h>
+#import <WXSDK/WechatAuthSDK.h>

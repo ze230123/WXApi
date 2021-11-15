@@ -3,19 +3,28 @@
 import UIKit
 import WXSDK
 
-//typealias WeChat = WXSDK.WXApi
-
 public typealias WXResult = Result<String, WXError>
 public typealias WXLoginComplation = (WXResult) -> Void
+public typealias WXPayComplation = (PayResult<WXError>) -> Void
+
+public typealias PayRequest = PayReq
+
+/// 支付结果
+public enum PayResult<Failure> where Failure: Error {
+    case success
+    case failure(Failure)
+}
 
 /// 微信接口
 public class WXApiManager: NSObject {
     private(set) static var shared: WXApiManager!
 
     var loginComplation: WXLoginComplation?
-
+    var payComplation: WXPayComplation?
     /// 微信配置
     let configuration: WXConfiguration
+
+    var task: URLSessionTask?
 
     /// 注册微信SDK
     /// - Parameter configation: 微信配置
@@ -26,7 +35,7 @@ public class WXApiManager: NSObject {
     /// 初始化微信接口
     /// - Parameter configuration: 微信配置
     init(configuration: WXConfiguration) {
-        WeChat.registerApp(configuration.appId, universalLink: configuration.universalLink)
+        WXApi.registerApp(configuration.appId, universalLink: configuration.universalLink)
         self.configuration = configuration
         super.init()
     }
@@ -38,15 +47,28 @@ public class WXApiManager: NSObject {
     ///   - complation: 回调
     func login(_ authReq: SendAuthReq, in viewController: UIViewController, complation: WXLoginComplation?) {
         loginComplation = complation
-        WeChat.sendAuthReq(authReq, viewController: viewController, delegate: self, completion: nil)
+        WXApi.sendAuthReq(authReq, viewController: viewController, delegate: self, completion: nil)
     }
 
-    func share() {
-        
+    func pay(_ order: PayRequest, complation: WXPayComplation?) {
+        payComplation = complation
+        WXApi.send(order, completion: nil)
+    }
+
+    func share(req: BaseReq) {
+
     }
 }
 
 public extension WXApiManager {
+    static func startLog(by level: WXLogLevel, logBlock: @escaping WXLogBolock) {
+        WXApi.startLog(by: level, logBlock: logBlock)
+    }
+
+    static func checkUniversalLinkReady(_ completion: @escaping WXCheckULCompletion) {
+        WXApi.checkUniversalLinkReady(completion)
+    }
+
     /// 授权登录
     /// - Parameters:
     ///   - viewController: 授权登录所在控制器
@@ -57,9 +79,17 @@ public extension WXApiManager {
         auth.state = shared.configuration.state
         shared.login(auth, in: viewController, complation: complation)
     }
+
+    static func pay(_ order: PayRequest, complation: WXPayComplation?) {
+        shared.pay(order, complation: complation)
+    }
+
+    static func handleOpenUniversalLink(_ userActivity: NSUserActivity) -> Bool {
+        return WXApi.handleOpenUniversalLink(userActivity, delegate: shared)
+    }
 }
 
-extension WXApiManager: WeChatDelegate {
+extension WXApiManager: WXApiDelegate {
     public func onReq(_ req: BaseReq) {
 
     }
@@ -67,6 +97,13 @@ extension WXApiManager: WeChatDelegate {
     public func onResp(_ resp: BaseResp) {
         if resp is SendAuthResp {
             handleAuthResponse(resp)
+        } else if resp is PayResp {
+            switch resp.errCode {
+            case 0:
+                payComplation?(.success)
+            default:
+                payComplation?(.failure(.paymentFailed))
+            }
         }
     }
 }
@@ -78,7 +115,6 @@ extension WXApiManager {
         guard let response = resp as? SendAuthResp else {
             return
         }
-
         switch response.errCode {
         case WXSuccess.rawValue:
             let code = response.code ?? ""
@@ -102,7 +138,7 @@ extension WXApiManager {
             return
         }
 
-        URLSession.shared.dataTask(with: url) { [unowned self] data, response, error in
+        task = URLSession.shared.dataTask(with: url) { [unowned self] data, response, error in
             if let error = error {
                 debugPrint(error.localizedDescription)
                 self.loginComplation?(.failure(.accessToken))
@@ -116,6 +152,7 @@ extension WXApiManager {
 
             do {
                 let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let result = try decoder.decode(AccessTokenResult.self, from: data)
                 let openId = try result.getOpenId()
                 self.loginComplation?(.success(openId))
@@ -123,5 +160,6 @@ extension WXApiManager {
                 self.loginComplation?(.failure(.accessToken))
             }
         }
+        task?.resume()
     }
 }

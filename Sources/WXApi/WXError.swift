@@ -13,6 +13,7 @@ public enum WXError: Error {
     case cancel
     case accessToken
     case failure(String)
+    case paymentFailed
 }
 
 extension WXError: LocalizedError {
@@ -26,6 +27,8 @@ extension WXError: LocalizedError {
             return "获取授权凭证失败"
         case .failure(let msg):
             return msg
+        case .paymentFailed:
+            return "支付失败"
         }
     }
 }

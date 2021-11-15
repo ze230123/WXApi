@@ -26,6 +26,16 @@ struct AccessTokenResult: Codable {
 }
 
 extension AccessTokenResult {
+    private enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+        case expiresIn = "expires_in"
+        case refreshToken = "refresh_token"
+        case openId = "openid"
+        case scope
+    }
+}
+
+extension AccessTokenResult {
     struct DataError: Error {
         var errCode: String?
         var errmsg: String?

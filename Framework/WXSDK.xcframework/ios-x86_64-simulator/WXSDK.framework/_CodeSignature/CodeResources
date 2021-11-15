@@ -4,13 +4,21 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Headers/WXApi.h</key>
+		<data>
+		VNDkiVroFPCkNP4BCkZJQ3XSQ0c=
+		</data>
+		<key>Headers/WXApiObject.h</key>
+		<data>
+		SrPFfORBT6MwEGoO2W7+gv2HC7E=
+		</data>
 		<key>Headers/WXSDK.h</key>
 		<data>
-		g6eQ35nV1Zb48t7HJu/ieDctnLA=
+		K1/lTmy5oMjOlkbRSdEDFsYoIos=
 		</data>
-		<key>Headers/WeChat.h</key>
+		<key>Headers/WechatAuthSDK.h</key>
 		<data>
-		enVaiJXr2SZUuHLntw0nUVh3x7w=
+		6beFSxsQAVAU2YA49kPcCypShO0=
 		</data>
 		<key>Info.plist</key>
 		<data>
@@ -20,33 +28,51 @@
 		<data>
 		R0XV3jQ840aWPvOpk7xR3rVNLs4=
 		</data>
-		<key>Script.sh</key>
-		<data>
-		JCydDsoXFgBTI7NXhqOwMoi6s1E=
-		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Headers/WXApi.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			VNDkiVroFPCkNP4BCkZJQ3XSQ0c=
+			</data>
+			<key>hash2</key>
+			<data>
+			s9OD05XbfSgayczEoMU0IQy0VImUHU4hyTu/hOCzg64=
+			</data>
+		</dict>
+		<key>Headers/WXApiObject.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			SrPFfORBT6MwEGoO2W7+gv2HC7E=
+			</data>
+			<key>hash2</key>
+			<data>
+			I902O+vooqG/3HFBTNWuS5QMx9a31SiYWJIzMW8PRlY=
+			</data>
+		</dict>
 		<key>Headers/WXSDK.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			g6eQ35nV1Zb48t7HJu/ieDctnLA=
+			K1/lTmy5oMjOlkbRSdEDFsYoIos=
 			</data>
 			<key>hash2</key>
 			<data>
-			XTksCg3ZaC3RIt12AhGdCEd8FIDsaxEVpq7EpS2sVEo=
+			oRwoAiFH5GODkfdryxKRUolmEOB4+nOnVtDPi3hWoDM=
 			</data>
 		</dict>
-		<key>Headers/WeChat.h</key>
+		<key>Headers/WechatAuthSDK.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			enVaiJXr2SZUuHLntw0nUVh3x7w=
+			6beFSxsQAVAU2YA49kPcCypShO0=
 			</data>
 			<key>hash2</key>
 			<data>
-			I6MgYyDSB7WHrURf0RLa9oquItdxNqCIIbmgRII77zw=
+			eX6ctZW1kLlhw/hTNNWOJPj0BpgwHGwje4CjdGBKA+c=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
@@ -58,17 +84,6 @@
 			<key>hash2</key>
 			<data>
 			vYf7tOCyXk1wNmEv8anSORXkLl/4zY4LYitmYzeXTgo=
-			</data>
-		</dict>
-		<key>Script.sh</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			JCydDsoXFgBTI7NXhqOwMoi6s1E=
-			</data>
-			<key>hash2</key>
-			<data>
-			34PBD2dwTt+6wckdlZiNzqo2vUmV9ONj3i9GgBN48Z4=
 			</data>
 		</dict>
 	</dict>
