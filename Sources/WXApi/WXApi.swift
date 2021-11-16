@@ -7,6 +7,8 @@ public typealias WXResult = Result<String, WXError>
 public typealias WXLoginComplation = (WXResult) -> Void
 public typealias WXPayComplation = (PayResult<WXError>) -> Void
 
+public typealias WXShareComplation = (ShareResult) -> Void
+
 public typealias PayRequest = PayReq
 
 /// 支付结果
@@ -15,12 +17,19 @@ public enum PayResult<Failure> where Failure: Error {
     case failure(Failure)
 }
 
+public enum ShareResult {
+    case success
+    case failure
+}
+
 /// 微信接口
 public class WXApiManager: NSObject {
     private(set) static var shared: WXApiManager!
 
-    var loginComplation: WXLoginComplation?
-    var payComplation: WXPayComplation?
+    private var loginComplation: WXLoginComplation?
+    private var payComplation: WXPayComplation?
+    private var shareComplation: WXShareComplation?
+
     /// 微信配置
     let configuration: WXConfiguration
 
@@ -55,8 +64,9 @@ public class WXApiManager: NSObject {
         WXApi.send(order, completion: nil)
     }
 
-    func share(req: BaseReq) {
-
+    func share(req: BaseReq, complation: WXShareComplation?) {
+        shareComplation = complation
+        WXApi.send(req, completion: nil)
     }
 }
 
@@ -84,8 +94,16 @@ public extension WXApiManager {
         shared.pay(order, complation: complation)
     }
 
+    static func share(_ req: BaseReq, complation: WXShareComplation?) {
+        shared.share(req: req, complation: complation)
+    }
+
     static func handleOpenUniversalLink(_ userActivity: NSUserActivity) -> Bool {
         return WXApi.handleOpenUniversalLink(userActivity, delegate: shared)
+    }
+
+    static func handleOpen(_ url: URL) -> Bool {
+        return WXApi.handleOpen(url, delegate: shared)
     }
 }
 
@@ -103,6 +121,13 @@ extension WXApiManager: WXApiDelegate {
                 payComplation?(.success)
             default:
                 payComplation?(.failure(.paymentFailed))
+            }
+        } else if resp is SendMessageToWXResp {
+            switch resp.errCode {
+            case WXSuccess.rawValue:
+                shareComplation?(.success)
+            default:
+                shareComplation?(.failure)
             }
         }
     }
@@ -162,4 +187,57 @@ extension WXApiManager {
         }
         task?.resume()
     }
+}
+
+public func friendRequest(url: String, title: String, description: String, image: UIImage) -> SendMessageToWXReq {
+
+    let message = WXMediaMessage()
+    // 大小不能超过32k
+    message.setThumbImage(image)
+    message.title = title
+    message.description = description
+
+    let obj = WXWebpageObject()
+    obj.webpageUrl = url
+    message.mediaObject = obj
+
+    let req = SendMessageToWXReq()
+    req.bText = false
+    req.message = message
+    req.scene = Int32(WXSceneSession.rawValue)
+    return req
+}
+
+public func timelineRequest(url: String, title: String, description: String, image: UIImage) -> SendMessageToWXReq {
+    let message = WXMediaMessage()
+    // 大小不能超过32k
+    message.setThumbImage(image)
+    message.title = title
+    message.description = description
+
+    let obj = WXWebpageObject()
+    obj.webpageUrl = url
+    message.mediaObject = obj
+
+    let req = SendMessageToWXReq()
+    req.bText = false
+    req.message = message
+    req.scene = Int32(WXSceneTimeline.rawValue)
+    return req
+}
+
+public func miniRequest(path: String, userName: String, title: String, description: String, image: UIImage?) -> SendMessageToWXReq {
+    let wxMiniObject = WXMiniProgramObject()
+    wxMiniObject.userName = userName
+    wxMiniObject.path = path
+    wxMiniObject.miniProgramType = .release
+    wxMiniObject.hdImageData = image?.jpegData(compressionQuality: 0.2)
+    let message = WXMediaMessage()
+    message.title = title
+    message.description = description
+    message.mediaObject = wxMiniObject
+    let req = SendMessageToWXReq()
+    req.message = message
+    req.scene = Int32(WXSceneSession.rawValue)
+    return req
 }

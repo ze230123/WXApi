@@ -17,11 +17,13 @@ public struct WXConfiguration {
     var appId: String
     var secret: String
     var universalLink: String
+    var userName: String
 
-    public init(appId: String, secret: String, universalLink: String) {
+    public init(appId: String, secret: String, universalLink: String, userName: String) {
         self.appId = appId
         self.secret = secret
         self.universalLink = universalLink
+        self.userName = userName
 
         scope = "snsapi_userinfo"
         state = Bundle.id
