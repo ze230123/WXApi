@@ -44,7 +44,8 @@ public class WXApiManager: NSObject {
     /// 初始化微信接口
     /// - Parameter configuration: 微信配置
     init(configuration: WXConfiguration) {
-        WXApi.registerApp(configuration.appId, universalLink: configuration.universalLink)
+        let isSuccess = WXApi.registerApp(configuration.appId, universalLink: configuration.universalLink)
+        print("注册WXSDK", isSuccess)
         self.configuration = configuration
         super.init()
     }
@@ -70,12 +71,12 @@ public class WXApiManager: NSObject {
     }
 }
 
-public extension WXApiManager {
-    static func startLog(by level: WXLogLevel, logBlock: @escaping WXLogBolock) {
+extension WXApiManager {
+    public static func startLog(by level: WXLogLevel, logBlock: @escaping WXLogBolock) {
         WXApi.startLog(by: level, logBlock: logBlock)
     }
 
-    static func checkUniversalLinkReady(_ completion: @escaping WXCheckULCompletion) {
+    public static func checkUniversalLinkReady(_ completion: @escaping WXCheckULCompletion) {
         WXApi.checkUniversalLinkReady(completion)
     }
 
@@ -83,26 +84,26 @@ public extension WXApiManager {
     /// - Parameters:
     ///   - viewController: 授权登录所在控制器
     ///   - complation: 回调
-    static func login(in viewController: UIViewController, complation: WXLoginComplation?) {
+    public static func login(in viewController: UIViewController, complation: WXLoginComplation?) {
         let auth = SendAuthReq()
         auth.scope = "snsapi_userinfo"
         auth.state = shared.configuration.state
         shared.login(auth, in: viewController, complation: complation)
     }
 
-    static func pay(_ order: PayRequest, complation: WXPayComplation?) {
+    public static func pay(_ order: PayRequest, complation: WXPayComplation?) {
         shared.pay(order, complation: complation)
     }
 
-    static func share(_ req: BaseReq, complation: WXShareComplation?) {
+    public static func share(_ req: BaseReq, complation: WXShareComplation?) {
         shared.share(req: req, complation: complation)
     }
 
-    static func handleOpenUniversalLink(_ userActivity: NSUserActivity) -> Bool {
+    public static func handleOpenUniversalLink(_ userActivity: NSUserActivity) -> Bool {
         return WXApi.handleOpenUniversalLink(userActivity, delegate: shared)
     }
 
-    static func handleOpen(_ url: URL) -> Bool {
+    public static func handleOpen(_ url: URL) -> Bool {
         return WXApi.handleOpen(url, delegate: shared)
     }
 }
@@ -189,6 +190,7 @@ extension WXApiManager {
     }
 }
 
+/// 创建分享好友请求
 public func friendRequest(url: String, title: String, description: String, image: UIImage) -> SendMessageToWXReq {
 
     let message = WXMediaMessage()
@@ -208,6 +210,7 @@ public func friendRequest(url: String, title: String, description: String, image
     return req
 }
 
+/// 创建分享朋友圈请求
 public func timelineRequest(url: String, title: String, description: String, image: UIImage) -> SendMessageToWXReq {
     let message = WXMediaMessage()
     // 大小不能超过32k
@@ -226,8 +229,10 @@ public func timelineRequest(url: String, title: String, description: String, ima
     return req
 }
 
+/// 创建分享小程序请求
 public func miniRequest(path: String, userName: String, title: String, description: String, image: UIImage?) -> SendMessageToWXReq {
     let wxMiniObject = WXMiniProgramObject()
+    wxMiniObject.webpageUrl = path
     wxMiniObject.userName = userName
     wxMiniObject.path = path
     wxMiniObject.miniProgramType = .release
@@ -237,7 +242,17 @@ public func miniRequest(path: String, userName: String, title: String, descripti
     message.description = description
     message.mediaObject = wxMiniObject
     let req = SendMessageToWXReq()
+    req.bText = false
     req.message = message
     req.scene = Int32(WXSceneSession.rawValue)
+    return req
+}
+
+/// 创建启动小程序请求
+public func launchMiniRequest(path: String, userName: String) -> WXLaunchMiniProgramReq {
+    let req = WXLaunchMiniProgramReq()
+    req.userName = userName
+    req.path = path
+    req.miniProgramType = .release
     return req
 }
