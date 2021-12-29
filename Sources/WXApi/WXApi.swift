@@ -22,6 +22,16 @@ public enum ShareResult {
     case failure
 }
 
+/// 小程序版本
+public enum ProgramType {
+    /// 正式版
+    case release
+    /// 开发版
+    case test
+    /// 体验版
+    case preview
+}
+
 /// 微信接口
 public class WXApiManager: NSObject {
     private(set) static var shared: WXApiManager!
@@ -230,12 +240,21 @@ public func timelineRequest(url: String, title: String, description: String, ima
 }
 
 /// 创建分享小程序请求
-public func miniRequest(path: String, userName: String, title: String, description: String, image: UIImage?) -> SendMessageToWXReq {
+public func miniRequest(path: String, userName: String, title: String, description: String, image: UIImage?, type: ProgramType) -> SendMessageToWXReq {
     let wxMiniObject = WXMiniProgramObject()
     wxMiniObject.webpageUrl = path
     wxMiniObject.userName = userName
     wxMiniObject.path = path
-    wxMiniObject.miniProgramType = .release
+
+    switch type {
+    case .release:
+        wxMiniObject.miniProgramType = .release
+    case .test:
+        wxMiniObject.miniProgramType = .test
+    case .preview:
+        wxMiniObject.miniProgramType = .preview
+    }
+
     wxMiniObject.hdImageData = image?.jpegData(compressionQuality: 0.2)
     let message = WXMediaMessage()
     message.title = title
