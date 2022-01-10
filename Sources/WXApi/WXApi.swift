@@ -23,7 +23,7 @@ public enum ShareResult {
 }
 
 /// 小程序版本
-public enum ProgramType {
+public enum ProgramType: String {
     /// 正式版
     case release
     /// 开发版
