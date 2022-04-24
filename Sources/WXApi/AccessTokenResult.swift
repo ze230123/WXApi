@@ -23,6 +23,50 @@ struct AccessTokenResult: Codable {
         }
         return openId
     }
+
+    func getAccessToken() throws -> String {
+        guard let accessToken = accessToken else {
+            throw DataError(errCode: errcode, errmsg: errmsg)
+        }
+        return accessToken
+    }
+}
+
+public struct WXUserInfoResult {
+    public var openId: String = ""
+    /// 普通用户昵称
+    public var nickName: String = ""
+    /// 用户头像，
+    public var headImgurl: String = ""
+}
+
+/// 用户信息
+struct UserInfoResult: Codable {
+    var openId: String = ""
+    /// 普通用户昵称
+    var nickName: String = ""
+    /// 普通用户性别，1 为男性，2 为女性
+    var sex: Int = 1
+    /// 普通用户个人资料填写的省份
+    var province: String = ""
+    /// 用户头像，
+    var headImgurl: String = ""
+    var city: String = ""
+    var unionid: String = ""
+    var privilege: [String] = []
+}
+
+extension UserInfoResult {
+    enum CodingKeys: String, CodingKey {
+        case openId = "openid"
+        case nickName = "nickname"
+        case headImgurl = "headimgurl"
+        case sex
+        case province
+        case city
+        case unionid
+        case privilege
+    }
 }
 
 extension AccessTokenResult {

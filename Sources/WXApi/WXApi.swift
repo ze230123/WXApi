@@ -3,13 +3,18 @@
 import UIKit
 import WXSDK
 
-public typealias WXResult = Result<String, WXError>
+public typealias WXResult = Result<WXUserInfoResult, WXError>
 public typealias WXLoginComplation = (WXResult) -> Void
 public typealias WXPayComplation = (PayResult<WXError>) -> Void
 
 public typealias WXShareComplation = (ShareResult) -> Void
 
 public typealias PayRequest = PayReq
+
+public struct AccessToken {
+    public let accessToken: String
+    public let openId: String
+}
 
 /// 支付结果
 public enum PayResult<Failure> where Failure: Error {
@@ -34,7 +39,7 @@ public enum ProgramType: String {
 
 /// 微信接口
 public class WXApiManager: NSObject {
-    private(set) static var shared: WXApiManager!
+    public static var shared: WXApiManager!
 
     private var loginComplation: WXLoginComplation?
     private var payComplation: WXPayComplation?
@@ -173,7 +178,6 @@ extension WXApiManager {
         guard let url = components?.url else {
             return
         }
-
         task = URLSession.shared.dataTask(with: url) { [unowned self] data, response, error in
             if let error = error {
                 debugPrint(error.localizedDescription)
@@ -188,12 +192,57 @@ extension WXApiManager {
 
             do {
                 let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                decoder.keyDecodingStrategy = .useDefaultKeys
                 let result = try decoder.decode(AccessTokenResult.self, from: data)
                 let openId = try result.getOpenId()
-                self.loginComplation?(.success(openId))
+                let token = try result.getAccessToken()
+                let item = AccessToken(accessToken: token, openId: openId)
+                /// 获取用户信息
+                queryUserInfo(item: item)
             } catch {
                 self.loginComplation?(.failure(.accessToken))
+            }
+        }
+        task?.resume()
+    }
+
+    /// 获取微信用户信息
+    func queryUserInfo(item: AccessToken) {
+
+        let host = "https://api.weixin.qq.com/sns/userinfo"
+        var components = URLComponents(string: host)
+        components?.queryItems = [
+            URLQueryItem(name: "access_token", value: item.accessToken),
+            URLQueryItem(name: "openid", value: item.openId),
+        ]
+
+        guard let url = components?.url else {
+            return
+        }
+        task = URLSession.shared.dataTask(with: url) { [unowned self] data, response, error in
+            if let error = error {
+                debugPrint(error.localizedDescription)
+                self.loginComplation?(.failure(.infoError))
+                return
+            }
+
+            guard let data = data else {
+                self.loginComplation?(.failure(.infoError))
+                return
+            }
+            
+            do {
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .useDefaultKeys
+                let result = try decoder.decode(UserInfoResult.self, from: data)
+                guard !result.openId.isEmpty else {
+                    self.loginComplation?(.failure(.infoError))
+                    return
+                }
+                let item = WXUserInfoResult(openId: result.openId, nickName: result.nickName, headImgurl: result.headImgurl)
+                self.loginComplation?(.success(item))
+            } catch {
+                self.loginComplation?(.failure(.infoError))
             }
         }
         task?.resume()

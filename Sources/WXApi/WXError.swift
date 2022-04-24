@@ -14,6 +14,7 @@ public enum WXError: Error {
     case accessToken
     case failure(String)
     case paymentFailed
+    case infoError
 }
 
 extension WXError: LocalizedError {
@@ -29,6 +30,8 @@ extension WXError: LocalizedError {
             return msg
         case .paymentFailed:
             return "支付失败"
+        case .infoError:
+            return "获取微信头像失败"
         }
     }
 }
