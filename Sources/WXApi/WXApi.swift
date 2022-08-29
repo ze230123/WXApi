@@ -239,7 +239,7 @@ extension WXApiManager {
                     self.loginComplation?(.failure(.infoError))
                     return
                 }
-                let item = WXUserInfoResult(openId: result.openId, nickName: result.nickName, headImgurl: result.headImgurl)
+                let item = WXUserInfoResult(openId: result.openId, nickName: result.nickName, headImgurl: result.headImgurl, unionId: result.unionid)
                 self.loginComplation?(.success(item))
             } catch {
                 self.loginComplation?(.failure(.infoError))

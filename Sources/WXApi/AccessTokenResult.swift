@@ -38,6 +38,8 @@ public struct WXUserInfoResult {
     public var nickName: String = ""
     /// 用户头像，
     public var headImgurl: String = ""
+
+    public var unionId: String = ""
 }
 
 /// 用户信息
