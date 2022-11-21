@@ -324,3 +324,32 @@ public func launchMiniRequest(path: String, userName: String) -> WXLaunchMiniPro
     req.miniProgramType = .release
     return req
 }
+
+public func friendImageRequest(imageData: Data) -> SendMessageToWXReq {
+    let imageObject = WXImageObject()
+    imageObject.imageData = imageData
+
+    let message = WXMediaMessage()
+    message.mediaObject = imageObject
+
+    let req = SendMessageToWXReq()
+    req.bText = false
+    req.message = message
+    req.scene = Int32(WXSceneSession.rawValue)
+    return req
+}
+
+/// 创建分享朋友圈请求
+public func timelineImageRequest(imageData: Data) -> SendMessageToWXReq {
+    let imageObject = WXImageObject()
+    imageObject.imageData = imageData
+
+    let message = WXMediaMessage()
+    message.mediaObject = imageObject
+
+    let req = SendMessageToWXReq()
+    req.bText = false
+    req.message = message
+    req.scene = Int32(WXSceneTimeline.rawValue)
+    return req
+}
