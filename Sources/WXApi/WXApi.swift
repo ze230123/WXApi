@@ -9,6 +9,8 @@ public typealias WXPayComplation = (PayResult<WXError>) -> Void
 
 public typealias WXShareComplation = (ShareResult) -> Void
 
+public typealias WXLaunchMiniComplation = () -> Void
+
 public typealias PayRequest = PayReq
 
 public struct AccessToken {
@@ -44,6 +46,7 @@ public class WXApiManager: NSObject {
     private var loginComplation: WXLoginComplation?
     private var payComplation: WXPayComplation?
     private var shareComplation: WXShareComplation?
+    private var launchMiniComplation: WXLaunchMiniComplation?
 
     /// 微信配置
     let configuration: WXConfiguration
@@ -84,6 +87,10 @@ public class WXApiManager: NSObject {
         shareComplation = complation
         WXApi.send(req, completion: nil)
     }
+
+    func send(_ req: BaseReq) {
+        WXApi.send(req)
+    }
 }
 
 extension WXApiManager {
@@ -112,6 +119,15 @@ extension WXApiManager {
 
     public static func share(_ req: BaseReq, complation: WXShareComplation?) {
         shared.share(req: req, complation: complation)
+    }
+
+    public static func launchMini(path: String, userName: String, complation: WXLaunchMiniComplation?) {
+        shared.launchMiniComplation = complation
+        let req = WXLaunchMiniProgramReq()
+        req.userName = userName
+        req.path = path
+        req.miniProgramType = .test
+        shared.send(req)
     }
 
     public static func handleOpenUniversalLink(_ userActivity: NSUserActivity) -> Bool {
@@ -145,6 +161,8 @@ extension WXApiManager: WXApiDelegate {
             default:
                 shareComplation?(.failure)
             }
+        } else if resp is WXLaunchMiniProgramResp {
+            launchMiniComplation?()
         }
     }
 }
