@@ -121,12 +121,19 @@ extension WXApiManager {
         shared.share(req: req, complation: complation)
     }
 
-    public static func launchMini(path: String, userName: String, complation: WXLaunchMiniComplation?) {
+    public static func launchMini(path: String, userName: String, type: ProgramType = .release, complation: WXLaunchMiniComplation? = nil) {
         shared.launchMiniComplation = complation
         let req = WXLaunchMiniProgramReq()
         req.userName = userName
         req.path = path
-        req.miniProgramType = .test
+        switch type {
+        case .release:
+            req.miniProgramType = .release
+        case .test:
+            req.miniProgramType = .test
+        case .preview:
+            req.miniProgramType = .preview
+        }
         shared.send(req)
     }
 
