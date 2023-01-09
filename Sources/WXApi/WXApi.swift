@@ -330,7 +330,7 @@ public func miniRequest(path: String, userName: String?, title: String, descript
         wxMiniObject.miniProgramType = .preview
     }
 
-    wxMiniObject.hdImageData = image?.jpegData(compressionQuality: 0.2)
+    wxMiniObject.hdImageData = image?.pngData()
     let message = WXMediaMessage()
     message.title = title
     message.description = description
