@@ -12,6 +12,7 @@ public typealias WXShareComplation = (ShareResult) -> Void
 public typealias WXLaunchMiniComplation = () -> Void
 
 public typealias PayRequest = PayReq
+public typealias BaseReq = WXSDK.BaseReq
 
 public struct AccessToken {
     public let accessToken: String
