@@ -343,11 +343,11 @@ public func miniRequest(path: String, userName: String?, title: String, descript
 }
 
 /// 创建启动小程序请求
-public func launchMiniRequest(path: String, userName: String) -> WXLaunchMiniProgramReq {
+public func launchMiniRequest(path: String, userName: String, miniType: WXMiniProgramType) -> WXLaunchMiniProgramReq {
     let req = WXLaunchMiniProgramReq()
     req.userName = userName
     req.path = path
-    req.miniProgramType = .release
+    req.miniProgramType = miniType
     return req
 }
 
